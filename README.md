@@ -36,30 +36,6 @@ sklearn_mojo/
 └── linear_regression.mojo  # Linear regression implementation
 ```
 
-## API Reference
-
-### Core Functions
-
-- `fit_linear_regression(X, y, fit_intercept=True)`: Fits a linear regression model
-- `predict_linear_regression(X, coef, intercept)`: Makes predictions using fitted parameters  
-- `score_linear_regression(X, y, coef, intercept)`: Calculates R² score
-
-### Matrix Utilities
-
-- `print_list(lst)`: Pretty prints a list
-- `add_ones_column(X)`: Adds a column of ones for intercept
-- `matmul(A, B)`: Matrix multiplication
-- `transpose(X)`: Matrix transpose
-- `solve_system(A, b)`: Solves linear system Ax = b
-
-## Implementation Details
-
-The implementation uses the normal equation method to solve linear regression:
-- Coefficients are calculated using (X^T * X)^(-1) * X^T * y
-- Matrix operations are implemented from scratch in pure Mojo
-- Supports fitting with or without intercept
-- Includes regularization for numerical stability
-
 ## Documentation
 
 For detailed documentation, see the `docs/` directory:
