@@ -26,8 +26,7 @@ After cloning, your directory should look like this:
 sklearn-mojo/
 ├── sklearn_mojo/          # Main package
 │   ├── __init__.mojo     # Package exports
-│   ├── matrix_utils.mojo # Matrix operations
-│   └── linear_regression.mojo # ML algorithms
+|   ├── ...
 ├── docs/                  # Documentation
 └── README.md             # Project overview
 ```
@@ -44,11 +43,9 @@ python3 -m venv .venv
 
 # Activate virtual environment
 source .venv/bin/activate  # Linux/Mac
-# or
-.venv\Scripts\activate     # Windows
 
-# Mojo should still be accessible
-which mojo
+# Install dependency
+
 ```
 
 ## Troubleshooting
