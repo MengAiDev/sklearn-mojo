@@ -87,4 +87,3 @@ fn main():
         print("    ", y_test_pred[i])
     
     print("\n✅ Linear Regression implementation completed successfully!")
-    print("This implementation provides a scikit-learn-like API in pure Mojo.")
