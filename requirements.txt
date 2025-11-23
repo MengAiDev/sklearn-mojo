@@ -1,0 +1,8 @@
+click==8.3.0
+mblack==25.6.1
+mojo==0.25.6.1
+mojo-compiler==0.25.6.1
+mojo-lldb-libs==0.25.6.1
+mypy_extensions==1.1.0
+pathspec==0.12.1
+platformdirs==4.5.0

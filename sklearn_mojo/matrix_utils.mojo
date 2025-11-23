@@ -1,4 +1,5 @@
 from builtin import *
+import math
 
 fn print_list(lst: List[Float64]):
     print("[", end="")
@@ -97,3 +98,31 @@ fn solve_system(A: List[List[Float64]], b: List[Float64]) -> List[Float64]:
             x[i] -= augmented[i][j] * x[j]
     
     return x.copy()
+
+fn sigmoid(x: Float64) -> Float64:
+    if x < -60.0:
+        return 0.0
+    elif x > 60.0:
+        return 1.0
+    else:
+        return 1.0 / (1.0 + math.exp(-x))
+
+fn sigmoid_derivative(x: Float64) -> Float64:
+    var s = sigmoid(x)
+    return s * (1.0 - s)
+
+fn log_loss(y_true: List[Float64], y_pred: List[Float64], epsilon: Float64 = 1e-15) -> Float64:
+    var loss: Float64 = 0.0
+    for i in range(len(y_true)):
+        var y_t = y_true[i]
+        var y_p = y_pred[i]
+        
+        y_p = max(y_p, epsilon)
+        y_p = min(y_p, 1.0 - epsilon)
+        
+        if y_t == 1.0:
+            loss += -math.log(y_p)
+        else:
+            loss += -math.log(1.0 - y_p)
+    
+    return loss / Float64(len(y_true))

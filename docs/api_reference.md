@@ -2,6 +2,207 @@
 
 Complete reference for all functions and types in sklearn-mojo package.
 
+## Core Logistic Regression Functions
+
+### `fit_logistic_regression`
+
+Fits a logistic regression model to training data using gradient descent.
+
+```mojo
+fn fit_logistic_regression(X: List[List[Float64]], y: List[Float64], fit_intercept: Bool = True, 
+                         learning_rate: Float64 = 0.01, max_iterations: Int = 1000, 
+                         tolerance: Float64 = 1e-6) -> (List[Float64], Float64)
+```
+
+**Parameters:**
+- `X`: Training feature matrix (n_samples × n_features)
+- `y`: Training binary labels (length n_samples, values 0.0 or 1.0)
+- `fit_intercept`: Whether to fit an intercept term (default: True)
+- `learning_rate`: Learning rate for gradient descent (default: 0.01)
+- `max_iterations`: Maximum number of iterations (default: 1000)
+- `tolerance`: Convergence tolerance (default: 1e-6)
+
+**Returns:**
+- `coefficients`: Model coefficients (length n_features or n_features + 1 if intercept)
+- `intercept`: Intercept value (0.0 if fit_intercept is False)
+
+**Example:**
+```mojo
+var X: List[List[Float64]] = [[1.0, 2.0], [2.0, 3.0], [3.0, 1.0]]
+var y: List[Float64] = [0.0, 1.0, 0.0]
+var (coef, intercept) = fit_logistic_regression(X, y, True, 0.1, 500)
+```
+
+**Implementation Details:**
+- Uses gradient descent with sigmoid activation
+- Automatically stops when convergence tolerance is met
+- Includes regularization to prevent overfitting
+
+### `predict_logistic_regression`
+
+Makes binary predictions using a fitted logistic regression model.
+
+```mojo
+fn predict_logistic_regression(X: List[List[Float64]], coef: List[Float64], 
+                             intercept: Float64, probability_threshold: Float64 = 0.5) -> List[Float64]
+```
+
+**Parameters:**
+- `X`: Feature matrix for predictions (n_samples × n_features)
+- `coef`: Model coefficients from `fit_logistic_regression`
+- `intercept`: Intercept value from `fit_logistic_regression`
+- `probability_threshold`: Threshold for binary classification (default: 0.5)
+
+**Returns:**
+- `predictions`: Binary predictions (length n_samples, values 0.0 or 1.0)
+
+**Example:**
+```mojo
+var X_test: List[List[Float64]] = [[1.0, 1.0], [2.0, 2.0]]
+var predictions = predict_logistic_regression(X_test, coef, intercept)
+```
+
+**Computation:**
+- Computes linear combination: z = intercept + sum(coef[i] * X[i][j])
+- Applies sigmoid: p = 1 / (1 + exp(-z))
+- Returns 1.0 if p >= threshold, 0.0 otherwise
+
+### `predict_proba_logistic_regression`
+
+Returns class probabilities instead of binary predictions.
+
+```mojo
+fn predict_proba_logistic_regression(X: List[List[Float64]], coef: List[Float64], 
+                                   intercept: Float64) -> List[Float64]
+```
+
+**Parameters:**
+- `X`: Feature matrix for predictions (n_samples × n_features)
+- `coef`: Model coefficients from `fit_logistic_regression`
+- `intercept`: Intercept value from `fit_logistic_regression`
+
+**Returns:**
+- `probabilities`: Class 1 probabilities (length n_samples, values 0.0 to 1.0)
+
+**Example:**
+```mojo
+var probabilities = predict_proba_logistic_regression(X_test, coef, intercept)
+```
+
+**Use Cases:**
+- Probability threshold tuning
+- Cost-sensitive classification
+- Calibration analysis
+
+### `score_logistic_regression`
+
+Calculates the classification accuracy score.
+
+```mojo
+fn score_logistic_regression(X: List[List[Float64]], y: List[Float64], coef: List[Float64], 
+                           intercept: Float64) -> Float64
+```
+
+**Parameters:**
+- `X`: Feature matrix
+- `y`: True binary labels (length n_samples)
+- `coef`: Model coefficients
+- `intercept`: Model intercept
+
+**Returns:**
+- `score`: Accuracy score (1.0 is perfect, 0.0 is worst)
+
+**Formula:**
+```
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+where TP=true positives, TN=true negatives, FP=false positives, FN=false negatives
+```
+
+### `log_loss_score_logistic_regression`
+
+Calculates the logarithmic loss (cross-entropy) score.
+
+```mojo
+fn log_loss_score_logistic_regression(X: List[List[Float64]], y: List[List[Float64]], coef: List[Float64], 
+                                    intercept: Float64) -> Float64
+```
+
+**Parameters:**
+- `X`: Feature matrix
+- `y`: True binary labels
+- `coef`: Model coefficients
+- `intercept`: Model intercept
+
+**Returns:**
+- `score`: Logarithmic loss (lower is better, 0.0 is perfect)
+
+**Formula:**
+```
+Log Loss = -(1/n) * Σ(y_true * log(y_pred) + (1 - y_true) * log(1 - y_pred))
+```
+
+**Use Cases:**
+- Model evaluation with probability outputs
+- Calibration assessment
+- Loss function for optimization
+
+## Mathematical Utilities
+
+### `sigmoid`
+
+Computes the sigmoid (logistic) function.
+
+```mojo
+fn sigmoid(x: Float64) -> Float64
+```
+
+**Parameters:**
+- `x`: Input value
+
+**Returns:**
+- Sigmoid output in range (0.0, 1.0)
+
+**Formula:**
+- For x >= 0: returns 1.0
+- For x <= 0: returns 0.0  
+- Otherwise: 1.0 / (1.0 + exp(-x))
+
+### `sigmoid_derivative`
+
+Computes the derivative of the sigmoid function.
+
+```mojo
+fn sigmoid_derivative(x: Float64) -> Float64
+```
+
+**Parameters:**
+- `x`: Input value
+
+**Returns:**
+- Sigmoid derivative
+
+**Formula:**
+- derivative = sigmoid(x) * (1 - sigmoid(x))
+
+### `log_loss`
+
+Computes the logarithmic loss (cross-entropy) for two vectors.
+
+```mojo
+fn log_loss(y_true: List[Float64], y_pred: List[Float64], epsilon: Float64 = 1e-15) -> Float64
+```
+
+**Parameters:**
+- `y_true`: True labels (0.0 or 1.0)
+- `y_pred`: Predicted probabilities (0.0 to 1.0)
+- `epsilon`: Small value to prevent log(0) (default: 1e-15)
+
+**Returns:**
+- Logarithmic loss value
+
+**Clamping:**
+- Automatically clamps predictions to [epsilon, 1.0 - epsilon] to avoid log(0)
+
 ## Core Linear Regression Functions
 
 ### `fit_linear_regression`
@@ -197,17 +398,31 @@ The package initialization file exports all public functions:
 ```mojo
 from .matrix_utils import *
 from .linear_regression import *
+from .logistic_regression import *
 ```
 
 **Exported Functions:**
+**Linear Regression:**
 - `fit_linear_regression`
 - `predict_linear_regression` 
 - `score_linear_regression`
+
+**Logistic Regression:**
+- `fit_logistic_regression`
+- `predict_logistic_regression`
+- `predict_proba_logistic_regression`
+- `score_logistic_regression`
+- `log_loss_score_logistic_regression`
+
+**Matrix Utilities:**
 - `print_list`
 - `add_ones_column`
 - `matmul`
 - `transpose`
 - `solve_system`
+- `sigmoid`
+- `sigmoid_derivative`
+- `log_loss`
 
 ### File Organization
 
@@ -215,7 +430,8 @@ from .linear_regression import *
 sklearn_mojo/
 ├── __init__.mojo              # Package exports
 ├── matrix_utils.mojo          # Matrix operations
-└── linear_regression.mojo     # ML algorithms
+├── linear_regression.mojo     # Linear regression
+└── logistic_regression.mojo   # Logistic regression
 ```
 
 ## Data Types
@@ -268,8 +484,16 @@ var empty_transposed = transpose([])  // returns []
 
 - `fit_linear_regression`: O(n²m) where n=features, m=samples
 - `predict_linear_regression`: O(nm)
+- `fit_logistic_regression`: O(iteration_count × n × m)
+- `predict_logistic_regression`: O(nm)
+- `predict_proba_logistic_regression`: O(nm)
 - `matmul`: O(mnp) for matrices (m×n) × (n×p)
 - `solve_system`: O(n³) for n×n system
+
+**Logistic Regression Notes:**
+- Time depends on convergence (typically 100-1000 iterations)
+- Each iteration: O(n × m) for gradient computation
+- More expensive than linear regression but handles classification
 
 ### Memory Usage
 
@@ -286,7 +510,7 @@ var empty_transposed = transpose([])  // returns []
 
 ## Examples
 
-### Complete Workflow
+### Complete Workflow - Linear Regression
 
 ```mojo
 from sklearn_mojo import fit_linear_regression, predict_linear_regression, score_linear_regression
@@ -306,6 +530,42 @@ var predictions = predict_linear_regression(X_test, coef, intercept)
 var score = score_linear_regression(X, y, coef, intercept)
 ```
 
+### Complete Workflow - Logistic Regression
+
+```mojo
+from sklearn_mojo import fit_logistic_regression, predict_logistic_regression, predict_proba_logistic_regression, score_logistic_regression
+
+// 1. Prepare data (binary classification)
+var X: List[List[Float64]] = [[1.0, 2.0], [2.0, 3.0], [3.0, 1.0]]
+var y: List[Float64] = [0.0, 1.0, 0.0]
+
+// 2. Train model with custom hyperparameters
+var (coef, intercept) = fit_logistic_regression(X, y, True, 0.1, 500)
+
+// 3. Make predictions
+var X_test: List[List[Float64]] = [[1.5, 2.5]]
+var binary_predictions = predict_logistic_regression(X_test, coef, intercept)
+var probabilities = predict_proba_logistic_regression(X_test, coef, intercept)
+
+// 4. Evaluate model
+var accuracy = score_logistic_regression(X, y, coef, intercept)
+```
+
+### Model Comparison
+
+```mojo
+// Compare both regression types
+var (lin_coef, lin_intercept) = fit_linear_regression(X_cont, y_cont, True)
+var (log_coef, log_intercept) = fit_logistic_regression(X_binary, y_binary, True)
+
+// Linear predictions (continuous values)
+var linear_pred = predict_linear_regression(X_test, lin_coef, lin_intercept)
+
+// Logistic predictions (binary + probabilities)
+var logistic_pred = predict_logistic_regression(X_test, log_coef, log_intercept)
+var logistic_proba = predict_proba_logistic_regression(X_test, log_coef, log_intercept)
+```
+
 ### Matrix Operations
 
 ```mojo
@@ -315,6 +575,19 @@ var X: List[List[Float64]] = [[1.0, 2.0]]
 var X_with_intercept = add_ones_column(X)
 var Xt = transpose(X)
 var XtX = matmul(Xt, X)
+```
+
+### Custom Thresholding
+
+```mojo
+// Adjust classification threshold for different use cases
+var probabilities = predict_proba_logistic_regression(X_test, coef, intercept)
+
+// Conservative classification (high precision)
+var conservative = predict_logistic_regression(X_test, coef, intercept, 0.8)
+
+// Liberal classification (high recall)
+var liberal = predict_logistic_regression(X_test, coef, intercept, 0.2)
 ```
 
 ## Version Information
